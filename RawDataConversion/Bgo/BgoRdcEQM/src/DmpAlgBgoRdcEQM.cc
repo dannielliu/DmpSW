@@ -158,30 +158,30 @@ bool DmpAlgBgoRdcEQM::ProcessThisEvent(){
 
 //-------------------------------------------------------------------
 bool DmpAlgBgoRdcEQM::ProcessThisEventHeader(){
-  static short tmp=0;
-  fEvtHeader->Reset();
+static short tmp=0;
+fEvtHeader->Reset();
 //-------------------------------------------------------------------
-  DmpLogDebug<<"[Header] from "<<fInFilePtr.tellg();
-  fInFilePtr.read((char*)(&tmp),1);
-  if (tmp!=0xe2)    return false;
-  fInFilePtr.read((char*)(&tmp),1);
-  if (tmp!=0x25)    return false;
-  fInFilePtr.read((char*)(&tmp),1);
-  if (tmp!=0x08)    return false;
-  fInFilePtr.read((char*)(&tmp),1);
-  if (tmp!=0x13)    return false;
+DmpLogDebug<<"[Header] from "<<fInFilePtr.tellg();
+fInFilePtr.read((char*)(&tmp),1);
+if (tmp!=0xe2)    return false;
+fInFilePtr.read((char*)(&tmp),1);
+if (tmp!=0x25)    return false;
+fInFilePtr.read((char*)(&tmp),1);
+if (tmp!=0x08)    return false;
+fInFilePtr.read((char*)(&tmp),1);
+if (tmp!=0x13)    return false;
 // *
 // *  TODO: trigger first byte means??
 // *
-  fInFilePtr.read((char*)(&tmp),1);      // this needed
-  fInFilePtr.read((char*)(&tmp),1);      // trigger
-  fEvtHeader->SetTrigger(DmpDetectorID::kWhole,tmp);
-  fInFilePtr.read((char*)(&tmp),1);      // Datalength
-  fInFilePtr.read((char*)(&tmp),1);      // Datalength
-  for (std::size_t index=0;index<8;++index) {     // size = 8
-    fInFilePtr.read((char*)(&tmp),1);
-    fEvtHeader->SetTime(index,tmp);
-  }
+fInFilePtr.read((char*)(&tmp),1);      // this needed
+fInFilePtr.read((char*)(&tmp),1);      // trigger
+fEvtHeader->SetTrigger(DmpDetectorID::kWhole,tmp);
+fInFilePtr.read((char*)(&tmp),1);      // Datalength
+fInFilePtr.read((char*)(&tmp),1);      // Datalength
+for (std::size_t index=0;index<8;++index) {     // size = 8
+fInFilePtr.read((char*)(&tmp),1);
+fEvtHeader->SetTime(index,tmp);
+}
 //-------------------------------------------------------------------
   return true;
 }
@@ -230,7 +230,12 @@ bool DmpAlgBgoRdcEQM::ProcessThisEventBgo(){
       for(short i=0;i<nSignal;++i){     // k0Compress
         fInFilePtr.read((char*)(&data),1);
         fInFilePtr.read((char*)(&data2),1);
-        AppendThisSignal(fCNCTMapBgo[feeID*1000+i],(data*256+data2)&0x3fff);
+	double AdcValue;
+	AdcValue=data*256+data2;
+	if (AdcValue>32767)
+		AdcValue -= 65536;
+        AppendThisSignal(fCNCTMapBgo[feeID*1000+i],AdcValue);
+
       }
     }else{
       nSignal = nBytes/3;
@@ -240,7 +245,11 @@ bool DmpAlgBgoRdcEQM::ProcessThisEventBgo(){
         fInFilePtr.read((char*)(&data),1);
         fInFilePtr.read((char*)(&data2),1);
         if(fCNCTMapBgo[feeID*1000+channelID] != 0){
-          AppendThisSignal(fCNCTMapBgo[feeID*1000+channelID],(data*256+data2)&0x3fff);
+	  double AdcValue;
+	  AdcValue=data*256+data2;
+	  if (AdcValue>32767)
+		AdcValue -= 65536;
+          AppendThisSignal(fCNCTMapBgo[feeID*1000+channelID],AdcValue);
         }else{
           DmpLogError<<"Connector Key Wrong. FeeID("<<feeID<<") Channel("<<channelID<<") ADC("<<data*256+data2<<")"<<DmpLogEndl;
         }
