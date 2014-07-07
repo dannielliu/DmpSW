@@ -230,10 +230,10 @@ bool DmpAlgBgoRdcEQM::ProcessThisEventBgo(){
       for(short i=0;i<nSignal;++i){     // k0Compress
         fInFilePtr.read((char*)(&data),1);
         fInFilePtr.read((char*)(&data2),1);
-	double AdcValue;
-	AdcValue=data*256+data2;
-	if (AdcValue>32767)
-		AdcValue -= 65536;
+	    long AdcValue;
+	    AdcValue=data*256+data2;
+	    //if (AdcValue>32767)
+	    //	AdcValue -= 65536;
         AppendThisSignal(fCNCTMapBgo[feeID*1000+i],AdcValue);
 
       }
@@ -245,11 +245,11 @@ bool DmpAlgBgoRdcEQM::ProcessThisEventBgo(){
         fInFilePtr.read((char*)(&data),1);
         fInFilePtr.read((char*)(&data2),1);
         if(fCNCTMapBgo[feeID*1000+channelID] != 0){
-	  double AdcValue;
-	  AdcValue=data*256+data2;
-	  if (AdcValue>32767)
-		AdcValue -= 65536;
-          AppendThisSignal(fCNCTMapBgo[feeID*1000+channelID],AdcValue);
+	    long AdcValue;
+	    AdcValue=data*256+data2;
+	  //if (AdcValue>32767)
+		//AdcValue -= 65536;
+        AppendThisSignal(fCNCTMapBgo[feeID*1000+channelID],AdcValue);
         }else{
           DmpLogError<<"Connector Key Wrong. FeeID("<<feeID<<") Channel("<<channelID<<") ADC("<<data*256+data2<<")"<<DmpLogEndl;
         }
